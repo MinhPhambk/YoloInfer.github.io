@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>YOLOv8 Object Detection</title>
+    <style>
+      canvas {
+        display: block;
+        border: 1px solid black;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <input id="uploadInput" type="file" />
+    <canvas></canvas>
+    <script>
+      const input = document.getElementById("uploadInput");
+      input.addEventListener("change", async (event) => {
+        await upload_file(event.target.files[0]);
+      });
+
+      async function upload_file(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        fetch(
+          "https://7b15-14-232-192-166.ngrok-free.app/img_object_detection_to_img/",
+          {
+            method: "POST",
+            body: formData,
+          }
+        ).then((res) => {
+          res.blob().then((blobResponse) => {
+            const data = blobResponse;
+            const img = new Image();
+            const urlCreator = window.URL || window.webkitURL;
+            img.onload = () => {
+              const canvas = document.querySelector("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0);
+            };
+            img.src = urlCreator.createObjectURL(data);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
